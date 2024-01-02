@@ -1,0 +1,4 @@
+--with-mysql
+--with-pgsql
+--with-openssl
+--enable-shell
