@@ -1,5 +1,5 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
-log4cplus-1.2.1-dev
+log4cplus-dev
 boost-dev
 pypi-zombie-imp
