@@ -26,7 +26,7 @@ BuildRequires : asciidoc
 BuildRequires : bison
 BuildRequires : boost-dev
 BuildRequires : flex
-BuildRequires : log4cplus-1.2.1-dev
+BuildRequires : log4cplus-dev
 BuildRequires : openssl-dev
 BuildRequires : perl
 BuildRequires : pkgconfig(log4cplus)
