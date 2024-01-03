@@ -1,0 +1,4 @@
+#kea-ctrl-agent.service  -m644 /lib/systemd/system/kea-ctrl-agent.service
+#kea-ddns-server.service  -m644 /lib/systemd/system/kea-ddns-server.service
+#kea-dhcp4-server.service  -m644 /lib/systemd/system/kea-dhcp4-server.service
+#kea-dhcp6-server.service  -m644 /lib/systemd/system/kea-dhcp6-server.service

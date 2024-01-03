@@ -1,0 +1,14 @@
+[Unit]
+Description=ISC KEA CTRL AGENT
+Documentation=man:kea-ctrl-agent(8)
+Wants=network-online.target
+After=network-online.target time-sync.target
+
+[Service]
+ExecStart=/usr/bin/kea-ctrl-agent -c /etc/kea/kea-ctrl-agent.conf
+RuntimeDirectory=kea
+RuntimeDirectoryMode=0775
+
+[Install]
+WantedBy=kea-dhcp4-server.service
+WantedBy=kea-dhcp6-server.service

@@ -1,0 +1,3 @@
+#mkdir -p /usr/share/defaults/kea
+#cp -r /etc/kea /usr/share/kea/
+#echo "FIXFIX"

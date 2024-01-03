@@ -9,10 +9,14 @@
 #
 Name     : dhcp-server-kea
 Version  : 2.4.1
-Release  : 1
+Release  : 2
 URL      : https://dl.cloudsmith.io/public/isc/kea-2-4/raw/versions/2.4.1/kea-2.4.1.tar.gz
 Source0  : https://dl.cloudsmith.io/public/isc/kea-2-4/raw/versions/2.4.1/kea-2.4.1.tar.gz
-Source1  : https://dl.cloudsmith.io/public/isc/kea-2-4/raw/versions/2.4.1/kea-2.4.1.tar.gz.asc
+Source1  : kea-ctrl-agent.service
+Source2  : kea-ddns-server.service
+Source3  : kea-dhcp4-server.service
+Source4  : kea-dhcp6-server.service
+Source5  : https://dl.cloudsmith.io/public/isc/kea-2-4/raw/versions/2.4.1/kea-2.4.1.tar.gz.asc
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : MPL-2.0
@@ -22,6 +26,7 @@ Requires: dhcp-server-kea-lib = %{version}-%{release}
 Requires: dhcp-server-kea-man = %{version}-%{release}
 Requires: dhcp-server-kea-python = %{version}-%{release}
 Requires: dhcp-server-kea-python3 = %{version}-%{release}
+Requires: dhcp-server-kea-services = %{version}-%{release}
 BuildRequires : asciidoc
 BuildRequires : bison
 BuildRequires : boost-dev
@@ -46,6 +51,7 @@ and a DHCP benchmarking tool, perfdhcp.
 Summary: bin components for the dhcp-server-kea package.
 Group: Binaries
 Requires: dhcp-server-kea-data = %{version}-%{release}
+Requires: dhcp-server-kea-services = %{version}-%{release}
 
 %description bin
 bin components for the dhcp-server-kea package.
@@ -116,6 +122,15 @@ Requires: python3-core
 python3 components for the dhcp-server-kea package.
 
 
+%package services
+Summary: services components for the dhcp-server-kea package.
+Group: Systemd services
+Requires: systemd
+
+%description services
+services components for the dhcp-server-kea package.
+
+
 %prep
 %setup -q -n kea-2.4.1
 cd %{_builddir}/kea-2.4.1
@@ -125,7 +140,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1703153659
+export SOURCE_DATE_EPOCH=1704269408
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
@@ -140,9 +155,24 @@ FFLAGS="$CLEAR_INTERMEDIATE_FFLAGS"
 FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
-%reconfigure --disable-static --with-openssl \
---enable-shell
-make  %{?_smp_mflags}
+%reconfigure --disable-static --prefix=/usr \
+--exec-prefix=/usr \
+--bindir=/usr/bin \
+--sbindir=/usr/bin \
+--sysconfdir=/usr/share/defaults \
+--datadir=/usr/share \
+--includedir=/usr/include \
+--libdir=/usr/lib64 \
+--libexecdir=/usr/libexec \
+--localstatedir=/var \
+--sharedstatedir=/usr/com \
+--mandir=/usr/share/man \
+--infodir=/usr/share/info \
+--disable-static \
+--with-openssl \
+--enable-shell \
+--docdir=/usr/share/doc/kea
+make  %{?_smp_mflags}  -j$(nproc --all)
 
 %check
 export LANG=C.UTF-8
@@ -166,9 +196,19 @@ FFLAGS="$CLEAR_INTERMEDIATE_FFLAGS"
 FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
-export SOURCE_DATE_EPOCH=1703153659
+export SOURCE_DATE_EPOCH=1704269408
 rm -rf %{buildroot}
 %make_install
+mkdir -p %{buildroot}/usr/lib/systemd/system
+install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/kea-ctrl-agent.service
+install -m 0644 %{SOURCE2} %{buildroot}/usr/lib/systemd/system/kea-ddns-server.service
+install -m 0644 %{SOURCE3} %{buildroot}/usr/lib/systemd/system/kea-dhcp4-server.service
+install -m 0644 %{SOURCE4} %{buildroot}/usr/lib/systemd/system/kea-dhcp6-server.service
+## install_append content
+#mkdir -p /usr/share/defaults/kea
+#cp -r /etc/kea /usr/share/kea/
+#echo "FIXFIX"
+## install_append end
 
 %files
 %defattr(-,root,root,-)
@@ -186,6 +226,11 @@ rm -rf %{buildroot}
 
 %files data
 %defattr(-,root,root,-)
+/usr/share/defaults/kea/kea-ctrl-agent.conf
+/usr/share/defaults/kea/kea-dhcp-ddns.conf
+/usr/share/defaults/kea/kea-dhcp4.conf
+/usr/share/defaults/kea/kea-dhcp6.conf
+/usr/share/defaults/kea/keactrl.conf
 /usr/share/kea/api/build-report.json
 /usr/share/kea/api/cache-clear.json
 /usr/share/kea/api/cache-flush.json
@@ -1058,3 +1103,10 @@ rm -rf %{buildroot}
 %files python3
 %defattr(-,root,root,-)
 /usr/lib/python3*/*
+
+%files services
+%defattr(-,root,root,-)
+/usr/lib/systemd/system/kea-ctrl-agent.service
+/usr/lib/systemd/system/kea-ddns-server.service
+/usr/lib/systemd/system/kea-dhcp4-server.service
+/usr/lib/systemd/system/kea-dhcp6-server.service
